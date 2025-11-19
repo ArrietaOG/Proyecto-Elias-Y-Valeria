@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tienda de Productos de Aseo - Demo</title>
+  <style>
+
+    :root {
+      --primario: #1e88e5;
+      --oscuro: #0d47a1;
+      --fondo: #f5f7fb;
+      --card: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background: var(--fondo);
+      color: #222;
+    }
+    header {
+      background: linear-gradient(90deg,var(--primario),var(--oscuro));
+      color: #fff;
+      padding: 26px 16px;
+      text-align: center;
+    }
+    header p { margin: 6px 0 0; opacity: 0.95; }
+
+    /* Menú */
+    nav.menu {
+      display:flex;
+      gap:12px;
+      justify-content:center;
+      padding:10px;
+      background: #1565c0;
+    }
+    nav.menu a {
+      color:#fff;
+      text-decoration:none;
+      padding:8px 12px;
+      border-radius:6px;
+      font-weight:600;
+    }
+    nav.menu a:hover { background: rgba(255,255,255,0.08); }
+
+    main {
+      max-width:1100px;
+      margin: 28px auto;
+      padding: 0 16px;
+    }
+
+    section {
+      display:block;
+      margin-bottom: 28px;
+    }
+
+    /* Productos */
+    .productos {
+      display:grid;
+      grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
+      gap:18px;
+    }
+    .card {
+      background:var(--card);
+      border-radius:10px;
+      padding:14px;
+      box-shadow:0 6px 18px rgba(16,24,40,0.06);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      text-align:center;
+    }
+    .card img {
+      width:100%;
+      height:250px;
+      object-fit:cover;
+      border-radius:8px;
+      margin-bottom:10px;
+    }
+    .precio { font-weight:700; margin-top:8px; }
+    .btn {
+      margin-top:12px;
+      padding:10px 14px;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:600;
+      background:var(--primario);
+      color:#fff;
+    }
+
+    /* Carrito / Checkout */
+    #carrito, #checkout {
+      display:none;
+      max-width:900px;
+      margin: 0 auto;
+    }
+    .item-carrito, .item-checkout {
+      background:#fff;
+      padding:12px;
+      border-radius:8px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      margin-bottom:10px;
+      box-shadow:0 4px 10px rgba(16,24,40,0.04);
+    }
+    .cantidad-input {
+      width:64px;
+      padding:6px;
+      border-radius:6px;
+      border:1px solid #ddd;
+    }
+    .acciones {
+      display:flex;
+      gap:8px;
+    }
+
+    /* DOFA */
+    table.dofa {
+      width:100%;
+      border-collapse:collapse;
+      background:#fff;
+      border-radius:8px;
+      overflow:hidden;
+      box-shadow:0 6px 18px rgba(16,24,40,0.04);
+    }
+    table.dofa th, table.dofa td {
+      padding:12px;
+      border-bottom:1px solid #eee;
+      vertical-align:top;
+    }
+    table.dofa th { background:#f1f5f9; text-align:left; }
+
+    footer {
+      text-align:center;
+      padding:20px;
+      background:#e9eef8;
+      margin-top:36px;
+    }
+
+    /* Responsive */
+    @media (max-width:600px){
+      nav.menu { flex-wrap:wrap; }
+      .card img { height:140px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Tienda de Productos de Aseo</h1>
+    <p>Calidad y precios justos para el cuidado del hogar</p>
+  </header>
+
+  <nav class="menu" aria-label="Navegación">
+    <a href="#inicio" onclick="mostrarSeccion('inicio')">Inicio</a>
+    <a href="#tienda" onclick="mostrarSeccion('tienda')">Tienda en Línea</a>
+    <a href="#contacto" onclick="mostrarSeccion('contacto')">Contacto</a>
+    <a href="#dofa" onclick="mostrarSeccion('dofa')">Matriz DOFA</a>
+    <a href="#carrito" onclick="mostrarSeccion('carrito'); actualizarCarrito()">🛒 Ver Carrito (<span id="contador">0</span>)</a>
+  </nav>
+
+  <main>
+    <!-- INICIO -->
+    <section id="inicio">
+      <h2>Bienvenidos</h2>
+      <p>Somos una tienda especializada en productos de limpieza y aseo para el hogar. Entregamos calidad y confianza en cada producto.</p>
+      <p><strong>Integrante del grupo:</strong> Elias Vega y Valeria Montes</p>
+    </section>
+
+    <!-- TIENDA -->
+    <section id="tienda" style="display:block;">
+      <h2>Tienda en Línea</h2>
+      <div class="productos" id="lista-productos"></div>
+    </section>
+
+    <!-- CONTACTO -->
+    <section id="contacto" style="display:block;">
+      <h2>Contacto</h2>
+      <ul>
+        <li>Email: tiendaaseo@gmail.com</li>
+        <li>Instagram: @tienda_aseo</li>
+        <li>Teléfono: +57 300 000 0000</li>
+      </ul>
+    </section>
+
+    <!-- DOFA -->
+    <section id="dofa" style="display:none;">
+      <h2>Matriz DOFA</h2>
+      <table class="dofa">
+        <tr>
+          <th>Fortalezas</th>
+          <th>Oportunidades</th>
+        </tr>
+        <tr>
+          <td>
+            <ul>
+              <li>Variedad de productos de limpieza.</li>
+              <li>Precios competitivos.</li>
+              <li>Atención personalizada.</li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li>Crecer ventas mediante redes sociales.</li>
+              <li>Alianzas con proveedores locales.</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <th>Debilidades</th>
+          <th>Amenazas</th>
+        </tr>
+        <tr>
+          <td>
+            <ul>
+              <li>Poca visibilidad inicial en el mercado digital.</li>
+              <li>Sin integración de pagos reales (simulación).</li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li>Competencia de cadenas y supermercados.</li>
+              <li>Fluctuación en costo de insumos.</li>
+            </ul>
+          </td>
+        </tr>
+      </table>
+    </section>
+
+    <!-- CARRITO -->
+    <section id="carrito" style="display:none;">
+      <h2>Carrito de Compras</h2>
+      <div id="contenedor-carrito"></div>
+      <div style="margin-top:12px;">
+        <strong id="total-carrito">Total: $0</strong>
+      </div>
+      <div style="margin-top:12px;">
+        <button class="btn" onclick="vaciarCarrito()">Vaciar carrito</button>
+        <button class="btn" onclick="irCheckout()" style="margin-left:10px;">Ir a pagar (simulación)</button>
+      </div>
+    </section>
+
+    <!-- CHECKOUT -->
+    <section id="checkout" style="display:none;">
+      <h2>Resumen de Compra (Simulación)</h2>
+      <div id="contenedor-checkout"></div>
+      <h3 id="total-checkout">Total a pagar: $0</h3>
+      <p>Esta es una simulación de compra. No se procesa ningún pago real.</p>
+      <button class="btn" onclick="confirmarCompra()">Finalizar compra</button>
+      <button class="btn" style="margin-left:8px; background:#777" onclick="mostrarSeccion('carrito'); actualizarCarrito()">Volver al carrito</button>
+    </section>
+  </main>
+
+  <footer>
+    © 2025 Tienda de Productos de Aseo — Proyecto Final
+  </footer>
+
+  <script>
+    // Datos: 5 productos
+    const productos = [
+      { id: 1, nombre: 'Detergente Líquido 1L', precio: 12000, img: 'https://elsuper.com.co/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MjExMjAxMSwicHVyIjoiYmxvYl9pZCJ9fQ==--1a735755fd118cbbf69fe16f3b6d51eda4d7cc95/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJwbmciLCJyZXNpemVfdG9fZml0IjpbODAwLDgwMF19LCJwdXIiOiJ2YXJpYXRpb24ifX0=--cef66509c9cdc75663c0eefd9421db1d2ea4fead/Imagen%20-%202024-11-13T112042.829.png?locale=es' },
+      { id: 2, nombre: 'Limpiavidrios 500ml', precio: 8000, img: 'https://exitocol.vtexassets.com/arquivos/ids/29430542/Limpia-Vidrios-Cristal-Regular-Pistola-X-500-ml-319451_a.jpg?v=638894040552630000' },
+      { id: 3, nombre: 'Jabón en Polvo 2kg', precio: 10000, img: 'https://exitocol.vtexassets.com/arquivos/ids/29082406/Detergente-En-Polvo-Ariel-Regular-2-Kg-94836_a.jpg?v=638878412944970000' },
+      { id: 4, nombre: 'Ambientador Spray', precio: 6500, img: 'https://www.papyser.com/catalogo/0502049.jpg' },
+      { id: 5, nombre: 'Desinfectante 1L', precio: 9500, img: 'https://laboratorioslps.com/new/wp-content/uploads/2023/12/Limp-Desinfectante-Lavanda-SHA-X-1L.jpg' }
+    ];
+
+    // Carrito: array con {id, nombre, precio, cantidad}
+    let carrito = [];
+
+    // Inicial: renderizar productos
+    function renderizarProductos() {
+      const cont = document.getElementById('lista-productos');
+      cont.innerHTML = '';
+      productos.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerHTML = `
+          <img src="${p.img}" alt="${p.nombre}">
+          <h3>${p.nombre}</h3>
+          <div class="precio">$${p.precio.toLocaleString()}</div>
+          <button class="btn" onclick="agregarAlCarrito(${p.id})">Agregar al carrito</button>
+        `;
+        cont.appendChild(div);
+      });
+    }
+
+    // Agregar producto al carrito (incrementa cantidad si ya existe)
+    function agregarAlCarrito(id) {
+      const prod = productos.find(x => x.id === id);
+      if (!prod) return;
+      const existente = carrito.find(item => item.id === id);
+      if (existente) {
+        existente.cantidad += 1;
+      } else {
+        carrito.push({ id: prod.id, nombre: prod.nombre, precio: prod.precio, cantidad: 1 });
+      }
+      actualizarContador();
+      alert(`${prod.nombre} agregado al carrito (simulación).`);
+    }
+
+    // Actualizar contador en el menú
+    function actualizarContador() {
+      const contador = carrito.reduce((s, it) => s + it.cantidad, 0);
+      document.getElementById('contador').innerText = contador;
+    }
+
+    // Mostrar sección y ocultar las demás
+    function mostrarSeccion(id) {
+      const secciones = ['inicio','tienda','contacto','dofa','carrito','checkout'];
+      secciones.forEach(s => {
+        const el = document.getElementById(s);
+        if (el) el.style.display = (s === id ? (s==='tienda' ? 'block' : 'block') : 'none');
+      });
+      if (id === 'tienda') window.scrollTo(0,0);
+    }
+
+    // Actualizar contenido del carrito (vista)
+    function actualizarCarrito() {
+      const cont = document.getElementById('contenedor-carrito');
+      cont.innerHTML = '';
+      if (carrito.length === 0) {
+        cont.innerHTML = '<p>El carrito está vacío.</p>';
+        document.getElementById('total-carrito').innerText = 'Total: $0';
+        return;
+      }
+      let total = 0;
+      carrito.forEach(item => {
+        total += item.precio * item.cantidad;
+        const nodo = document.createElement('div');
+        nodo.className = 'item-carrito';
+        nodo.innerHTML = `
+          <div style="flex:1;">
+            <strong>${item.nombre}</strong>
+            <div>Precio unitario: $${item.precio.toLocaleString()}</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <input class="cantidad-input" type="number" min="1" value="${item.cantidad}" onchange="cambiarCantidad(${item.id}, this.value)">
+            <div style="width:110px; text-align:right;">Subtotal: $${(item.precio * item.cantidad).toLocaleString()}</div>
+            <div class="acciones">
+              <button class="btn" onclick="quitarProducto(${item.id})" style="background:#e53935;">Eliminar</button>
+            </div>
+          </div>
+        `;
+        cont.appendChild(nodo);
+      });
+      document.getElementById('total-carrito').innerText = 'Total: $' + total.toLocaleString();
+    }
+
+    // Cambiar cantidad desde input
+    function cambiarCantidad(id, valor) {
+      const cantidad = parseInt(valor, 10);
+      if (isNaN(cantidad) || cantidad < 1) return;
+      const item = carrito.find(i => i.id === id);
+      if (!item) return;
+      item.cantidad = cantidad;
+      actualizarContador();
+      actualizarCarrito();
+    }
+
+    // Quitar producto completamente
+    function quitarProducto(id) {
+      carrito = carrito.filter(i => i.id !== id);
+      actualizarContador();
+      actualizarCarrito();
+    }
+
+    // Vaciar carrito
+    function vaciarCarrito() {
+      if (!confirm('¿Deseas vaciar el carrito?')) return;
+      carrito = [];
+      actualizarContador();
+      actualizarCarrito();
+    }
+
+    // Ir a checkout (resumen)
+    function irCheckout() {
+      mostrarSeccion('checkout');
+      renderizarCheckout();
+    }
+
+    // Renderizar checkout
+    function renderizarCheckout() {
+      const cont = document.getElementById('contenedor-checkout');
+      cont.innerHTML = '';
+      if (carrito.length === 0) {
+        cont.innerHTML = '<p>No hay productos en el carrito.</p>';
+        document.getElementById('total-checkout').innerText = 'Total a pagar: $0';
+        return;
+      }
+      let total = 0;
+      carrito.forEach(item => {
+        total += item.precio * item.cantidad;
+        const div = document.createElement('div');
+        div.className = 'item-checkout';
+        div.innerHTML = `
+          <div style="flex:1;">
+            <strong>${item.nombre}</strong>
+            <div>Cantidad: ${item.cantidad}</div>
+          </div>
+          <div style="text-align:right;">
+            <div>Precio unitario: $${item.precio.toLocaleString()}</div>
+            <div>Subtotal: $${(item.precio * item.cantidad).toLocaleString()}</div>
+          </div>
+        `;
+        cont.appendChild(div);
+      });
+      document.getElementById('total-checkout').innerText = 'Total a pagar: $' + total.toLocaleString();
+    }
+
+    // Confirmar compra (simulación)
+    function confirmarCompra() {
+      alert('Compra finalizada (simulación). Gracias por su compra.');
+      carrito = [];
+      actualizarContador();
+      mostrarSeccion('inicio');
+    }
+
+    // Inicializaciones
+    renderizarProductos();
+    actualizarContador();
+
+    // Para seguridad: evitar errores si el usuario intenta interactuar muy rápidamente
+    window.agregarAlCarrito = agregarAlCarrito;
+    window.mostrarSeccion = mostrarSeccion;
+    window.actualizarCarrito = actualizarCarrito;
+    window.irCheckout = irCheckout;
+    window.vaciarCarrito = vaciarCarrito;
+    window.cambiarCantidad = cambiarCantidad;
+    window.quitarProducto = quitarProducto;
+    window.confirmarCompra = confirmarCompra;
+    window.renderizarCheckout = renderizarCheckout;
+  </script>
+</body>
+</html>
